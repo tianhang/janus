@@ -1,40 +1,40 @@
 {
-  "name": "bacchus",
-  "version": "1.0.0",
-  "description": "bacchus",
-  "main": "server/server.js",
-  "scripts": {
-    "reload": "lb-ng server/server.js client/js/services/lb-services.js",
-    "pretest": "jshint .",
-    "postinstall": "bower install",
-    "start": "npm run reload && node .",
-    "test": "./node_modules/.bin/mocha --reporter spec"
-  },
-  "dependencies": {
-    "compression": "^1.0.3",
-    "cors": "^2.5.2",
-    "errorhandler": "^1.1.1",
-    "loopback": "^2.14.0",
-    "loopback-boot": "^2.6.5",
-    "loopback-datasource-juggler": "^2.19.0",
-    "serve-favicon": "^2.0.1"
-  },
-  "optionalDependencies": {
-    "loopback-component-explorer": "^2.1.0"
-  },
-  "devDependencies": {
-    "bower": "^1.5.2",
-    "chai": "^3.5.0",
-    "jshint": "^2.5.6",
-    "mocha": "^3.2.0",
-    "tape": "^4.2.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/HavenInc/bacchus"
-  },
-  "engines": {
-    "node": "6"
-  },
-  "license": "MIT"
+    "name": "bacchus",
+    "version": "1.0.0",
+    "description": "bacchus",
+    "main": "server/server.js",
+    "scripts": {
+        "reload": "lb-ng server/server.js client/js/services/lb-services.js",
+        "pretest": "jshint .",
+        "postinstall": "bower install",
+        "start": "npm run reload &&  supervisor node .",
+        "test": "./node_modules/.bin/mocha --reporter spec"
+    },
+    "dependencies": {
+        "compression": "^1.0.3",
+        "cors": "^2.5.2",
+        "errorhandler": "^1.1.1",
+        "loopback": "^2.14.0",
+        "loopback-boot": "^2.6.5",
+        "loopback-datasource-juggler": "^2.19.0",
+        "serve-favicon": "^2.0.1"
+    },
+    "optionalDependencies": {
+        "loopback-component-explorer": "^2.1.0"
+    },
+    "devDependencies": {
+        "bower": "^1.5.2",
+        "chai": "^3.5.0",
+        "jshint": "^2.5.6",
+        "mocha": "^3.2.0",
+        "tape": "^4.2.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/HavenInc/bacchus"
+    },
+    "engines": {
+        "node": "6"
+    },
+    "license": "MIT"
 }
