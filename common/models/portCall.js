@@ -34,7 +34,6 @@ module.exports = function(PortCall) {
         return voyagesPairList;
     };
 
-
     function gatherAllVoys(routesMap) {
         var allVoys = [];
         var routeids = Object.keys(routesMap);
@@ -93,7 +92,7 @@ module.exports = function(PortCall) {
         return allVoys.concat(transList);
     }
 
-    PortCall.getRoutes = function(etd, eta, cb) {
+    PortCall.getVoyages = function(etd, eta, cb) {
         // For more information on how to query data in loopback please see
         // https://docs.strongloop.com/display/public/LB/Querying+data
         const query = {
@@ -120,6 +119,45 @@ module.exports = function(PortCall) {
                 console.log("routeMap ...");
                 console.log(routeMap);
                 console.log(allVoys);
+                return cb(null, allVoys);
+            })
+            .catch(err => {
+                console.log(err);
+
+                return cb(err);
+            });
+    };
+
+    PortCall.getRoutes = function(etd, eta, cb) {
+        // For more information on how to query data in loopback please see
+        // https://docs.strongloop.com/display/public/LB/Querying+data
+        const query = {
+            where: {
+                and: [{ // port call etd >= etd param, or can be null
+                        or: [{ etd: { gte: etd } }, { etd: null }]
+                    },
+                    { // port call eta <= eta param, or can be null
+                        or: [{ eta: { lte: eta } }, { eta: null }]
+                    }
+                ]
+            }
+        };
+
+        PortCall.find(query)
+            .then(calls => {
+                // TODO: convert port calls to voyages/routes
+
+
+                // console.log("portcall find ...");
+                // console.log(calls);
+                // var routeMap = groupRoutesByRouteId(calls);
+                // var allVoys = gatherAllVoys(routeMap);
+                // var voysDepMap = groupVoyByDepPort(allVoys);
+                // console.log("routeMap ...");
+                // console.log(routeMap);
+                // console.log(allVoys);
+
+
                 return cb(null, calls);
             })
             .catch(err => {
@@ -136,6 +174,16 @@ module.exports = function(PortCall) {
         ],
         returns: [
             { arg: 'routes', type: 'array', root: true }
+        ]
+    });
+
+    PortCall.remoteMethod('getVoyages', {
+        accepts: [
+            { arg: 'etd', 'type': 'date' },
+            { arg: 'eta', 'type': 'date' }
+        ],
+        returns: [
+            { arg: 'voys', type: 'array', root: true }
         ]
     });
 

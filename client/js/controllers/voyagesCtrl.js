@@ -5,6 +5,7 @@ angular
 function VoyagesCtrl($log, PortCall) {
 
     let ctrl = this;
+    console.log(PortCall);
 
     ctrl.voyages = [];
 
@@ -18,6 +19,20 @@ function VoyagesCtrl($log, PortCall) {
         const params = { etd, eta };
 
         PortCall.getRoutes(params).$promise
+            .then(voyages => {
+                console.log("=====");
+                console.log(voyages);
+                ctrl.voyages = voyages;
+            })
+            .catch(err => {
+                $log.error(err);
+            });
+    };
+
+    ctrl.getVoyages = (etd, eta) => {
+        const params = { etd, eta };
+
+        PortCall.getVoyages(params).$promise
             .then(voyages => {
                 console.log("=====");
                 console.log(voyages);
