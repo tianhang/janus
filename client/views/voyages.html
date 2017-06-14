@@ -2,7 +2,7 @@
 
     <h1>Voyages</h1>
 
-    <!-- Sample interface -->
+    <!--  interface -->
 
     <form class="form-inline">
         <div class="form-group">
@@ -28,28 +28,39 @@
                 is-open="ctrl.isEtaOpen"
             />
         </div>
-        <div class="form-group">
-
+        <div class="form-group tranship">
+            <label>Transhipments</label>
         </div>
-        <button type="submit"
-            class="btn btn-primary"
-            ng-click="ctrl.getVoyages(ctrl.etd, ctrl.eta)">
-      Find
-    </button>
+        <div class="form-group">
+            <switch enabled
+                name="enabled"
+                ng-model="ctrl.trshipEnabled"
+                class="green"></switch>
+        </div>
+
+        <div class="form-group find-btn">
+            <button type="submit"
+                class="btn btn-primary"
+                ng-click="ctrl.getVoyages(ctrl.etd, ctrl.eta,ctrl.trshipEnabled)">
+        Find
+        </button>
+        </div>
 
     </form>
 
-    <!-- Display the list of Voyage data - this is just as an example of displaying the initial data -->
-    <table class="table table-striped"
+    <!-- Display the list of Voyage data -->
+    <table st-table="displayedCollection"
+        st-safe-src="ctrl.voyages"
+        class="table table-striped"
         ng-show="ctrl.voyages.length">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Dep
-                    Ports
+                <!--<th>Date</th>-->
+                <th>Departure
+                    Port
                 </th>
 
-                <th>Arr
+                <th>Arrival
                     Port
                 </th>
                 <th>
@@ -60,24 +71,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="voyage in ctrl.voyages">
-                <th>
-                    <!--{{
-                    voyage.id
-                    }}-->
-                    {{$index +
-                    1}}
-                </th>
-                <td>{{
-                    voyage.startPort.port
-                    }}
-                </td>
-                <td>
-                    {{ voyage.endPort.port
-                    }}
-                </td>
-                <td>
+            <tr ng-repeat="voyage in displayedCollection">
+
+                <td>{{voyage.startPort.port}}</td>
+                <td>{{voyage.endPort.port}}</td>
+                <td ng-if="!voyage.isTranshipment">
                     {{voyage.startPort.vessel}}
+                </td>
+                <td ng-if="voyage.isTranshipment">
+                    {{voyage.startPort.vessel}}
+                    to
+                    {{voyage.endPort.vessel}}
                 </td>
                 <!--<td>{{
                     (voyage.eta
@@ -97,6 +101,16 @@
                 </td>-->
             </tr>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5"
+                    class="text-center">
+                    <div st-pagination=""
+                        st-items-by-page="ctrl.itemsByPage"
+                        st-displayed-pages="7"></div>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 
 </div>

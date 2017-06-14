@@ -6,8 +6,9 @@ function VoyagesCtrl($log, PortCall) {
 
     let ctrl = this;
     console.log(PortCall);
-
+    ctrl.itemsByPage = 11;
     ctrl.voyages = [];
+    ctrl.trshipEnabled = false;
 
     ctrl.dateOptions = {
         initDate: new Date(2016, 00, 01),
@@ -29,9 +30,9 @@ function VoyagesCtrl($log, PortCall) {
             });
     };
 
-    ctrl.getVoyages = (etd, eta) => {
-        const params = { etd, eta };
-
+    ctrl.getVoyages = (etd, eta, trshipEnabled) => {
+        const params = { etd, eta, trshipEnabled };
+        console.log(params);
         PortCall.getVoyages(params).$promise
             .then(voyages => {
                 console.log("=====");

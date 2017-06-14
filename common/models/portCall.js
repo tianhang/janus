@@ -23,11 +23,11 @@ module.exports = function(PortCall) {
     };
 
     function getPosblVoyByPortcalls(portCallsList) {
-        var voyagesPairList = [];
-        var len = portCallsList.length;
-        for (var i = 0; i < len; i++) {
-            for (var j = i + 1; j < len; j++) {
-                var voy = new VoyagesPair(portCallsList[i], portCallsList[j]);
+        let voyagesPairList = [];
+        const len = portCallsList.length;
+        for (let i = 0; i < len; i++) {
+            for (let j = i + 1; j < len; j++) {
+                let voy = new VoyagesPair(portCallsList[i], portCallsList[j]);
                 voyagesPairList.push(voy);
             }
         }
@@ -35,20 +35,14 @@ module.exports = function(PortCall) {
     };
 
     function gatherAllVoys(routesMap) {
-        var allVoys = [];
-        var routeids = Object.keys(routesMap);
+        let allVoys = [];
+        let routeids = Object.keys(routesMap);
         //console.log(routeids);
-        routeids.forEach(function(rid) {
+        routeids.forEach((rid) => {
             var pcalls = routesMap[rid];
             var voys = getPosblVoyByPortcalls(pcalls);
             //console.log(voys);
             allVoys = allVoys.concat(voys)
-        });
-        //console.log(allVoys);
-        allVoys.sort(function(v1, v2) {
-            return new Date(v1.startPort.eta) > new Date(v2.startPort.eta) ? 1 : -1;
-            //return v1.startPort.port > v2.startPort.port ? 1 : -1;
-            //return v1.startPort.vessel > v2.startPort.vessel ? 1 : -1;
         });
         return allVoys;
     };
@@ -75,7 +69,7 @@ module.exports = function(PortCall) {
         return result;
     }
 
-    function appendTranshipments2Voys(allVoys) {
+    function appendTranshipments2Voys(allVoys, voyPortMap) {
         var transList = [];
         allVoys.forEach(function(voy) {
             var port = voy.startPort.port;
@@ -92,7 +86,7 @@ module.exports = function(PortCall) {
         return allVoys.concat(transList);
     }
 
-    PortCall.getVoyages = function(etd, eta, cb) {
+    PortCall.getVoyages = function(etd, eta, trshipEnabled, cb) {
         // For more information on how to query data in loopback please see
         // https://docs.strongloop.com/display/public/LB/Querying+data
         const query = {
@@ -111,14 +105,20 @@ module.exports = function(PortCall) {
             .then(calls => {
                 // TODO: convert port calls to voyages/routes
                 console.log("portcall find ...");
-                console.log(calls);
+                console.log(trshipEnabled);
+                //console.log(calls);
                 //console.log(cb);
                 var routeMap = groupRoutesByRouteId(calls);
                 var allVoys = gatherAllVoys(routeMap);
-                var voysDepMap = groupVoyByDepPort(allVoys);
+                console.log(allVoys.length);
+                if (trshipEnabled) {
+                    var voysDepMap = groupVoyByDepPort(allVoys);
+                    allVoys = appendTranshipments2Voys(allVoys, voysDepMap);
+                    console.log(allVoys.length);
+                }
                 console.log("routeMap ...");
-                console.log(routeMap);
-                console.log(allVoys);
+                //console.log(routeMap);
+                //console.log(allVoys);
                 return cb(null, allVoys);
             })
             .catch(err => {
@@ -146,18 +146,6 @@ module.exports = function(PortCall) {
         PortCall.find(query)
             .then(calls => {
                 // TODO: convert port calls to voyages/routes
-
-
-                // console.log("portcall find ...");
-                // console.log(calls);
-                // var routeMap = groupRoutesByRouteId(calls);
-                // var allVoys = gatherAllVoys(routeMap);
-                // var voysDepMap = groupVoyByDepPort(allVoys);
-                // console.log("routeMap ...");
-                // console.log(routeMap);
-                // console.log(allVoys);
-
-
                 return cb(null, calls);
             })
             .catch(err => {
@@ -180,7 +168,8 @@ module.exports = function(PortCall) {
     PortCall.remoteMethod('getVoyages', {
         accepts: [
             { arg: 'etd', 'type': 'date' },
-            { arg: 'eta', 'type': 'date' }
+            { arg: 'eta', 'type': 'date' },
+            { arg: 'trshipEnabled', 'type': 'Boolean' }
         ],
         returns: [
             { arg: 'voys', type: 'array', root: true }
