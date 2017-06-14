@@ -2,11 +2,13 @@
 
 module.exports = function(PortCall) {
 
-    //voyage model
-    function VoyagesPair(startPort, endPort, isTranshipment) {
-        this.startPort = startPort;
-        this.endPort = endPort;
-        this.isTranshipment = isTranshipment || false;
+    //voyage class
+    class VoyagesPair {
+        constructor(startPort, endPort, isTranshipment) {
+            this.startPort = startPort;
+            this.endPort = endPort;
+            this.isTranshipment = isTranshipment || false;
+        }
     }
 
     function groupRoutesByRouteId(portCalls) {
