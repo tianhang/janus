@@ -10,13 +10,13 @@ module.exports = function(PortCall) {
     }
 
     function groupRoutesByRouteId(portCalls) {
-        //<routeid,[]>
-        var routesGroupMap = {};
-        portCalls.forEach(function(elem) {
-            if (!routesGroupMap[elem.routeId]) {
-                routesGroupMap[elem.routeId] = [];
+        //<routeid,array>
+        let routesGroupMap = new Map();
+        portCalls.forEach((elem) => {
+            if (!routesGroupMap.get(elem.routeId)) {
+                routesGroupMap.set(elem.routeId, []);
             }
-            routesGroupMap[elem.routeId].push(elem);
+            routesGroupMap.get(elem.routeId).push(elem);
 
         });
         return routesGroupMap;
@@ -36,32 +36,29 @@ module.exports = function(PortCall) {
 
     function gatherAllVoys(routesMap) {
         let allVoys = [];
-        let routeids = Object.keys(routesMap);
-        //console.log(routeids);
-        routeids.forEach((rid) => {
-            var pcalls = routesMap[rid];
-            var voys = getPosblVoyByPortcalls(pcalls);
-            //console.log(voys);
+        for (let rid of routesMap.keys()) {
+            let pcalls = routesMap.get(rid);
+            let voys = getPosblVoyByPortcalls(pcalls);
             allVoys = allVoys.concat(voys)
-        });
+        }
         return allVoys;
     };
 
     function groupVoyByDepPort(allVoys) {
-        var voyMap = {};
-        allVoys.forEach(function(voy) {
-            if (!voyMap[voy.startPort.port]) {
-                voyMap[voy.startPort.port] = [];
+        let voyMap = new Map();
+        allVoys.forEach((voy) => {
+            if (!voyMap.get(voy.startPort.port)) {
+                voyMap.set(voy.startPort.port, []);
             }
-            voyMap[voy.startPort.port].push(voy);
+            voyMap.get(voy.startPort.port).push(voy);
         });
         return voyMap;
     };
 
     function filterTranTargetByDate(depDate, tranTargetList) {
-        var result = [];
+        let result = [];
         if (!depDate) return result;
-        tranTargetList.forEach(function(target) {
+        tranTargetList.forEach((target) => {
             if (new Date(target.startPort.eta) > new Date(depDate)) {
                 result.push(target);
             }
@@ -70,18 +67,17 @@ module.exports = function(PortCall) {
     }
 
     function appendTranshipments2Voys(allVoys, voyPortMap) {
-        var transList = [];
+        let transList = [];
         allVoys.forEach(function(voy) {
-            var port = voy.startPort.port;
-            var depDate = voy.startPort.eta;
-            var tranTargetList = voyPortMap[port];
-            var filteredTranTargetList = filterTranTargetByDate(depDate, tranTargetList);
-            filteredTranTargetList.forEach(function(target) {
+            let port = voy.startPort.port;
+            let depDate = voy.startPort.eta;
+            let tranTargetList = voyPortMap.get(port);
+            let filteredTranTargetList = filterTranTargetByDate(depDate, tranTargetList);
+            filteredTranTargetList.forEach((target) => {
                 if (voy.startPort.routeId != target.startPort.routeId) {
                     transList.push(new VoyagesPair(voy.startPort, target.startPort, true));
                 }
             });
-            //transList.push(new VoyagesPair(voy,))
         });
         return allVoys.concat(transList);
     }
@@ -105,20 +101,13 @@ module.exports = function(PortCall) {
             .then(calls => {
                 // TODO: convert port calls to voyages/routes
                 console.log("portcall find ...");
-                console.log(trshipEnabled);
-                //console.log(calls);
-                //console.log(cb);
-                var routeMap = groupRoutesByRouteId(calls);
-                var allVoys = gatherAllVoys(routeMap);
-                console.log(allVoys.length);
+                let routeMap = groupRoutesByRouteId(calls);
+                let allVoys = gatherAllVoys(routeMap);
                 if (trshipEnabled) {
-                    var voysDepMap = groupVoyByDepPort(allVoys);
+                    let voysDepMap = groupVoyByDepPort(allVoys);
                     allVoys = appendTranshipments2Voys(allVoys, voysDepMap);
-                    console.log(allVoys.length);
                 }
                 console.log("routeMap ...");
-                //console.log(routeMap);
-                //console.log(allVoys);
                 return cb(null, allVoys);
             })
             .catch(err => {
