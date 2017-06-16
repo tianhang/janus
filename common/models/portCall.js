@@ -34,15 +34,22 @@ module.exports = function(PortCall) {
         var result = true;
         if (countMap.has(depPort)) {
             arrPortList = countMap.get(depPort);
+        } else {
+            return true;
         }
-        let len = arrPortList.length;
-        if (len >= 3) return false;
-
-        arrPortList.forEach((item) => {
+        //let len = arrPortList.length;
+        //if (len >= 3) return false;
+        for (let item of arrPortList) {
             if (item.port === arrPort.port) {
                 result = false;
+                break;
             }
-        });
+        }
+        // arrPortList.forEach((item) => {
+        //     if (item.port === arrPort.port) {
+        //         result = false;
+        //     }
+        // });
         return result;
     }
     /**
@@ -61,8 +68,8 @@ module.exports = function(PortCall) {
                 if (!countMap.has(depPort)) {
                     countMap.set(depPort, []);
                 }
-                //filter invalid voyage pair
-                // eact dep port  can only have at most 3 arrival ports at the same date
+                //filter invalid voyage pairs , duplicated voyage pairs
+                // each dep port's arrival ports should be different at the same date
                 if (depPort.port !== arrPort.port && checkValidity(countMap, depPort, arrPort)) {
                     let voy = new VoyagesPair(depPort, arrPort);
                     voyagesPairList.push(voy);
@@ -107,16 +114,45 @@ module.exports = function(PortCall) {
      * @param  Array transhipment Target List
      * @return Array all valid transhipment Target
      */
-    function filterTranTargetByDate(depDate, tranTargetList) {
+    function filterTranTargetByDate(depPort, tranTargetList) {
         let result = [];
-        if (!depDate) return result;
+        //if (!depDate) return result;
+        let ETA = new Date(depPort.eta);
+        let ETD = new Date(depPort.etd);
+
         tranTargetList.forEach((target) => {
-            if (new Date(target.startPort.eta) > new Date(depDate)) {
+            let targetETA = new Date(target.startPort.eta);
+            if (targetETA > ETA && targetETA < ETD) {
                 result.push(target);
             }
+            // if (targetETA > ETA) {
+            //     result.push(target);
+            // }
         });
         return result;
     }
+
+    function checkIfExist(callMap, voyDepPortId, voyArrPortId) {
+        let portIdList = callMap.get(voyDepPortId) || [];
+        let index = portIdList.indexOf(voyArrPortId);
+        return index >= 0;
+    }
+    // function checkIfExist(tempTransList, voyPair) {
+    //     let result = false;
+    //     console.log(tempTransList);
+    //     for (let item of tempTransList) {
+    //         console.log(item.startPort.id, voyPair.startPort.id);
+    //         console.log(item.endPort.id, voyPair.endPort.id);
+    //         if ((item.startPort.id === voyPair.startPort.id) && (item.endPort.id === voyPair.endPort.id)) {
+    //             result = true;
+    //             break;
+    //         }
+    //     }
+    //     console.log(result);
+    //     return result;
+    // }
+
+
     /**
      * append transhipments to result set and return
      * @param  Array all voyages
@@ -125,18 +161,32 @@ module.exports = function(PortCall) {
      */
     function appendTranshipments2Voys(allVoys, voyPortMap) {
         let transList = [];
+        let callMap = new Map();
         allVoys.forEach(function(voy) {
             let port = voy.startPort.port;
             let depDate = voy.startPort.eta;
             let tranTargetList = voyPortMap.get(port);
+            let tempTransList = [];
             // target voyages whose departure date should be later than current departure date 
-            let filteredTranTargetList = filterTranTargetByDate(depDate, tranTargetList);
+            let filteredTranTargetList = filterTranTargetByDate(voy.startPort, tranTargetList);
             filteredTranTargetList.forEach((target) => {
                 if (voy.startPort.routeId != target.startPort.routeId) {
-                    transList.push(new VoyagesPair(voy.startPort, target.startPort, true));
+                    let voyPair = new VoyagesPair(voy.startPort, target.startPort, true);
+                    let voyDepPortId = voy.startPort.id;
+                    let voyArrPortId = target.startPort.id
+                    if (!callMap.has(voyDepPortId)) {
+                        callMap.set(voyDepPortId, []);
+                    }
+                    if (!checkIfExist(callMap, voyDepPortId, voyArrPortId)) {
+                        transList.push(voyPair);
+                        callMap.get(voyDepPortId).push(voyArrPortId);
+                    }
                 }
             });
+            //transList = transList.concat(tempTransList);
+            //console.log(tempTransList);
         });
+        //console.log(allVoys.concat(transList));
         return allVoys.concat(transList);
     }
     /**

@@ -61,7 +61,7 @@
                     Port
                 </th>
 
-                <th>Arrival
+                <th st-sort="endPort.port">Arrival
                     Port
                 </th>
                 <th>
@@ -87,7 +87,13 @@
                     -->
                     {{voyage.endPort.vessel}}
                 </td>
-                <td>{{voyage.startPort.eta||'N/A'|
+                <td ng-if="!voyage.isTranshipment">{{voyage.startPort.eta||'N/A'|
+                    date:'medium'}}
+                </td>
+                <td ng-if="voyage.isTranshipment">{{voyage.startPort.eta||'N/A'|
+                    date:'medium'}}
+                    -->
+                    {{voyage.endPort.eta||'N/A'|
                     date:'medium'}}
                 </td>
                 <!--<td>{{
