@@ -30,26 +30,19 @@ module.exports = function(PortCall) {
     };
 
     function checkValidity(countMap, depPort, arrPort) {
+        if (depPort.port === arrPort.port) return false;
         let arrPortList = [];
         var result = true;
-        if (countMap.has(depPort)) {
-            arrPortList = countMap.get(depPort);
+        if (countMap.has(depPort.id)) {
+            arrPortList = countMap.get(depPort.id);
         } else {
             return true;
         }
-        //let len = arrPortList.length;
-        //if (len >= 3) return false;
         for (let item of arrPortList) {
             if (item.port === arrPort.port) {
-                result = false;
-                break;
+                return false;
             }
         }
-        // arrPortList.forEach((item) => {
-        //     if (item.port === arrPort.port) {
-        //         result = false;
-        //     }
-        // });
         return result;
     }
     /**
@@ -62,18 +55,18 @@ module.exports = function(PortCall) {
         let countMap = new Map();
         const len = portCallsList.length;
         for (let i = 0; i < len; i++) {
+            let depPort = portCallsList[i];
             for (let j = i + 1; j < len; j++) {
-                let depPort = portCallsList[i];
                 let arrPort = portCallsList[j];
-                if (!countMap.has(depPort)) {
-                    countMap.set(depPort, []);
+                if (!countMap.has(depPort.id)) {
+                    countMap.set(depPort.id, []);
                 }
                 //filter invalid voyage pairs , duplicated voyage pairs
                 // each dep port's arrival ports should be different at the same date
-                if (depPort.port !== arrPort.port && checkValidity(countMap, depPort, arrPort)) {
+                if (checkValidity(countMap, depPort, arrPort)) {
                     let voy = new VoyagesPair(depPort, arrPort);
                     voyagesPairList.push(voy);
-                    countMap.get(depPort).push(arrPort);
+                    countMap.get(depPort.id).push(arrPort);
                 }
             }
         }
@@ -122,12 +115,9 @@ module.exports = function(PortCall) {
 
         tranTargetList.forEach((target) => {
             let targetETA = new Date(target.startPort.eta);
-            if (targetETA > ETA && targetETA < ETD) {
+            if (targetETA >= ETA && targetETA < ETD) {
                 result.push(target);
             }
-            // if (targetETA > ETA) {
-            //     result.push(target);
-            // }
         });
         return result;
     }
@@ -137,21 +127,6 @@ module.exports = function(PortCall) {
         let index = portIdList.indexOf(voyArrPortId);
         return index >= 0;
     }
-    // function checkIfExist(tempTransList, voyPair) {
-    //     let result = false;
-    //     console.log(tempTransList);
-    //     for (let item of tempTransList) {
-    //         console.log(item.startPort.id, voyPair.startPort.id);
-    //         console.log(item.endPort.id, voyPair.endPort.id);
-    //         if ((item.startPort.id === voyPair.startPort.id) && (item.endPort.id === voyPair.endPort.id)) {
-    //             result = true;
-    //             break;
-    //         }
-    //     }
-    //     console.log(result);
-    //     return result;
-    // }
-
 
     /**
      * append transhipments to result set and return
