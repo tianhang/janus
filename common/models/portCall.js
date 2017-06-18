@@ -176,7 +176,7 @@ module.exports = function(PortCall) {
     PortCall.getVoyages = function(etd, eta, trshipEnabled, cb) {
         // For more information on how to query data in loopback please see
         // https://docs.strongloop.com/display/public/LB/Querying+data
-        let query = {
+        const query = {
             where: {
                 and: [{ // port call etd >= etd param, or can be null
                         or: [{ etd: { gte: etd } }, { etd: null }]
