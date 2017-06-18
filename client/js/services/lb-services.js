@@ -1919,49 +1919,6 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 
             /**
              * @ngdoc method
-             * @name lbServices.PortCall#getRoutes
-             * @methodOf lbServices.PortCall
-             *
-             * @description
-             *
-             * <em>
-             * (The remote method definition does not provide any description.)
-             * </em>
-             *
-             * @param {Object=} parameters Request parameters.
-             *
-             *   This method does not accept any parameters.
-             *   Supply an empty object or omit this argument altogether.
-             *
-             * @param {Object} postData Request data.
-             *
-             *  - `etd` – `{date=}` -
-             *
-             *  - `eta` – `{date=}` -
-             *
-             * @param {function(Array.<Object>,Object)=} successCb
-             *   Success callback with two arguments: `value`, `responseHeaders`.
-             *
-             * @param {function(Object)=} errorCb Error callback with one argument:
-             *   `httpResponse`.
-             *
-             * @returns {Array.<Object>} An empty reference that will be
-             *   populated with the actual data once the response is returned
-             *   from the server.
-             *
-             * <em>
-             * (The remote method definition does not provide any description.
-             * This usually means the response is a `PortCall` object.)
-             * </em>
-             */
-            "getRoutes": {
-              isArray: true,
-              url: urlBase + "/PortCalls/getRoutes",
-              method: "POST",
-            },
-
-            /**
-             * @ngdoc method
              * @name lbServices.PortCall#getVoyages
              * @methodOf lbServices.PortCall
              *
