@@ -27,7 +27,7 @@ module.exports = function(PortCall) {
         return portCallMap;
     };
     /**
-     * check whether the voyage port pair is valid to avoid repeated port pair
+     * check whether the voyage port pair is valid to avoid repeated port call pairs
      * @param {Map} listMap <id,Array>
      * @param {*} depPort 
      * @param {*} arrPort 
