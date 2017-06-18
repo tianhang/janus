@@ -152,13 +152,13 @@ module.exports = function(PortCall) {
             let filteredTranTargetList = filterTranTargetByDate(voy.startPort, tranTargetList);
             filteredTranTargetList.forEach((target) => {
                 if (voy.startPort.routeId != target.startPort.routeId) {
-                    let voyPair = new VoyagesPair(voy.startPort, target.startPort, true);
                     let voyDepPortId = voy.startPort.id;
                     let voyArrPortId = target.startPort.id
                     if (!listMap.has(voyDepPortId)) {
                         listMap.set(voyDepPortId, []);
                     }
                     if (!checkIfExist(listMap, voyDepPortId, voyArrPortId)) {
+                        let voyPair = new VoyagesPair(voy.startPort, target.startPort, true);
                         transList.push(voyPair);
                         listMap.get(voyDepPortId).push(voyArrPortId);
                     }
