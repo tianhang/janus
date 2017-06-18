@@ -16,26 +16,11 @@ function VoyagesCtrl($log, PortCall) {
         startingDay: 1
     };
 
-    ctrl.getRoutes = (etd, eta) => {
-        const params = { etd, eta };
-
-        PortCall.getRoutes(params).$promise
-            .then(voyages => {
-                console.log("=====");
-                console.log(voyages);
-                ctrl.voyages = voyages;
-            })
-            .catch(err => {
-                $log.error(err);
-            });
-    };
-
     ctrl.getVoyages = (etd, eta, trshipEnabled) => {
         const params = { etd, eta, trshipEnabled };
         console.log(params);
         PortCall.getVoyages(params).$promise
             .then(voyages => {
-                console.log("=====");
                 console.log(voyages);
                 ctrl.voyages = voyages;
             })
@@ -43,7 +28,6 @@ function VoyagesCtrl($log, PortCall) {
                 $log.error(err);
             });
     };
-
 }
 
 VoyagesCtrl.$inject = ['$log', 'PortCall'];
